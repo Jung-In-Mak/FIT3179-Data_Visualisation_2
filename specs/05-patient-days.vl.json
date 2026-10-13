@@ -1,0 +1,64 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Days of care have grown in public hospitals",
+    "anchor": "start",
+    "font": "Arial",
+    "fontSize": 15,
+    "color": "#21333a"
+  },
+  "data": {
+    "url": "data/patient-days-sector.csv",
+    "format": { "type": "csv" }
+  },
+  "transform": [
+    { "filter": "datum.Sector !== 'All hospitals'" }
+  ],
+  "width": "container",
+  "height": 290,
+  "mark": {
+    "type": "line",
+    "point": { "filled": true, "size": 65 },
+    "strokeWidth": 3
+  },
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "ordinal",
+      "title": null,
+      "axis": { "labelAngle": 0 }
+    },
+    "y": {
+      "field": "PatientDays",
+      "type": "quantitative",
+      "title": "Patient days",
+      "axis": { "format": "~s" }
+    },
+    "color": {
+      "field": "Sector",
+      "type": "nominal",
+      "title": "Hospital sector",
+      "scale": {
+        "domain": ["Public hospitals", "Private hospitals"],
+        "range": ["#187b79", "#d77b45"]
+      },
+      "legend": { "orient": "bottom" }
+    },
+    "tooltip": [
+      { "field": "Year", "title": "Financial year" },
+      { "field": "Sector", "title": "Hospital sector" },
+      { "field": "PatientDays", "title": "Patient days", "format": "," }
+    ]
+  },
+  "config": {
+    "view": { "stroke": null },
+    "axis": {
+      "gridColor": "#edf1ef",
+      "labelColor": "#6b7b80",
+      "titleColor": "#6b7b80",
+      "labelFont": "Arial",
+      "titleFont": "Arial"
+    },
+    "legend": { "labelFont": "Arial", "labelColor": "#6b7b80" }
+  }
+}

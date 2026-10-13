@@ -1,0 +1,52 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "The Rising Tide: Australian Hospital Admissions",
+    "subtitle": "Public vs. Private Sector Growth (2020–21 to 2024–25)",
+    "fontSize": 15,
+    "subtitleFontSize": 11,
+    "anchor": "start",
+    "offset": 10
+  },
+  "data": {
+    "url": "data/hospital_admissions.csv"
+  },
+  "width": 500,
+  "height": 350,
+  "mark": {
+    "type": "line",
+    "point": {"filled": true, "size": 60},
+    "strokeWidth": 3
+  },
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "ordinal",
+      "title": "Financial Year",
+      "axis": {"labelAngle": 0}
+    },
+    "y": {
+      "field": "Admissions",
+      "type": "quantitative",
+      "title": "Total Admissions (Separations)",
+      "axis": {"format": ","}
+    },
+    "color": {
+      "field": "Sector",
+      "type": "nominal",
+      "title": "Hospital Sector",
+      "scale": {
+        "domain": ["Public Hospitals", "Private Hospitals", "All Hospitals"],
+        "range": ["#1f77b4", "#ff7f0e", "#2ca02c"]
+      },
+      "legend": {
+        "orient": "bottom"
+      }
+    },
+    "tooltip": [
+      {"field": "Year", "title": "Year"},
+      {"field": "Sector", "title": "Sector"},
+      {"field": "Admissions", "title": "Admissions", "format": ","}
+    ]
+  }
+}

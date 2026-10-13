@@ -1,0 +1,53 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Hospital-location density across the map",
+    "anchor": "start",
+    "font": "Arial",
+    "fontSize": 15,
+    "color": "#21333a"
+  },
+  "width": "container",
+  "height": 350,
+  "projection": { "type": "mercator" },
+  "layer": [
+    {
+      "data": {
+        "url": "data/australian-states.geojson",
+        "format": { "type": "json", "property": "features" }
+      },
+      "mark": { "type": "geoshape", "fill": "#edf1ef", "stroke": "#c2cfca", "strokeWidth": 0.7 }
+    },
+    {
+      "data": { "values": { "type": "FeatureCollection", "features": [] } },
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#ffffff",
+        "strokeWidth": 0.5,
+        "opacity": 0.78
+      },
+      "encoding": {
+        "color": {
+          "field": "properties.Count",
+          "type": "quantitative",
+          "title": "Hospitals per grid cell",
+          "scale": { "scheme": "orangered" },
+          "legend": { "orient": "bottom", "format": "d" }
+        },
+        "tooltip": [
+          { "field": "properties.Count", "title": "Hospital locations in cell" },
+          { "field": "properties.Facilities", "title": "Examples" }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "view": { "stroke": null },
+    "legend": {
+      "labelColor": "#6b7b80",
+      "titleColor": "#21333a",
+      "labelFont": "Arial",
+      "titleFont": "Arial"
+    }
+  }
+}

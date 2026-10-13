@@ -1,0 +1,68 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Mental health separations by age and sex",
+    "anchor": "start",
+    "font": "Arial",
+    "fontSize": 15,
+    "color": "#21333a"
+  },
+  "data": {
+    "url": "data/mental-health-age-sex.csv",
+    "format": { "type": "csv" }
+  },
+  "transform": [
+    {
+      "calculate": "datum.Sex === 'Males' ? -toNumber(datum.Separations) : toNumber(datum.Separations)",
+      "as": "SignedSeparations"
+    }
+  ],
+  "width": "container",
+  "height": 360,
+  "mark": { "type": "bar", "cornerRadiusEnd": 2 },
+  "encoding": {
+    "y": {
+      "field": "AgeGroup",
+      "type": "ordinal",
+      "sort": ["0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85-89", "90-94", "95+"],
+      "title": "Age group (years)",
+      "axis": { "labelColor": "#6b7b80", "titleColor": "#6b7b80" }
+    },
+    "x": {
+      "field": "SignedSeparations",
+      "type": "quantitative",
+      "title": "Separations (equal scale on each side)",
+      "scale": { "domain": [-40000, 40000] },
+      "axis": {
+        "labelExpr": "abs(datum.value)",
+        "format": "~s",
+        "gridColor": "#edf1ef"
+      }
+    },
+    "color": {
+      "field": "Sex",
+      "type": "nominal",
+      "title": null,
+      "scale": {
+        "domain": ["Males", "Females"],
+        "range": ["#187b79", "#d77b45"]
+      },
+      "legend": { "orient": "bottom" }
+    },
+    "tooltip": [
+      { "field": "AgeGroup", "title": "Age group" },
+      { "field": "Sex", "title": "Sex" },
+      { "field": "Separations", "title": "Mental health separations", "format": "," }
+    ]
+  },
+  "config": {
+    "view": { "stroke": null },
+    "axis": {
+      "labelColor": "#6b7b80",
+      "titleColor": "#6b7b80",
+      "labelFont": "Arial",
+      "titleFont": "Arial"
+    },
+    "legend": { "labelFont": "Arial", "labelColor": "#6b7b80" }
+  }
+}

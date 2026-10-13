@@ -1,0 +1,82 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "How hospital activity flows from sector to service",
+    "anchor": "start",
+    "font": "Arial",
+    "fontSize": 15,
+    "color": "#21333a"
+  },
+  "width": 1120,
+  "height": 520,
+  "layer": [
+    {
+      "data": { "values": [] },
+      "mark": {
+        "type": "rule",
+        "strokeCap": "round",
+        "opacity": 0.3
+      },
+      "encoding": {
+        "x": { "field": "X", "type": "quantitative", "scale": { "domain": [0, 1120], "range": [0, 1120] }, "axis": null },
+        "x2": { "field": "X2" },
+        "y": { "field": "Y", "type": "quantitative", "scale": { "domain": [0, 520], "range": [0, 520] }, "axis": null },
+        "y2": { "field": "Y2" },
+        "strokeWidth": { "field": "Value", "type": "quantitative", "scale": { "range": [0.5, 22] }, "legend": null },
+        "color": { "field": "Color", "type": "nominal", "scale": null, "legend": null },
+        "tooltip": [
+          { "field": "Source", "title": "From" },
+          { "field": "Target", "title": "To" },
+          { "field": "Value", "title": "Separations", "format": "," }
+        ]
+      }
+    },
+    {
+      "data": { "values": [] },
+      "mark": { "type": "rect", "cornerRadius": 2 },
+      "encoding": {
+        "x": { "field": "X", "type": "quantitative", "scale": { "domain": [0, 1120], "range": [0, 1120] }, "axis": null },
+        "x2": { "field": "X2" },
+        "y": { "field": "Y", "type": "quantitative", "scale": { "domain": [0, 520], "range": [0, 520] }, "axis": null },
+        "y2": { "field": "Y2" },
+        "color": { "field": "Column", "type": "ordinal", "scale": { "domain": [0, 1, 2], "range": ["#187b79", "#5488a0", "#8070a8"] }, "legend": null },
+        "tooltip": [
+          { "field": "Name", "title": "Category" },
+          { "field": "Value", "title": "Separations", "format": "," }
+        ]
+      }
+    },
+    {
+      "data": { "values": [] },
+      "transform": [{ "filter": "datum.Label !== ''" }],
+      "mark": { "type": "text", "align": "left", "baseline": "middle", "font": "Arial", "fontSize": 10, "color": "#21333a", "limit": 175 },
+      "encoding": {
+        "x": { "field": "LabelX", "type": "quantitative", "scale": { "domain": [0, 1120], "range": [0, 1120] }, "axis": null },
+        "y": { "field": "LabelY", "type": "quantitative", "scale": { "domain": [0, 520], "range": [0, 520] }, "axis": null },
+        "text": { "field": "Label" },
+        "tooltip": [
+          { "field": "Name", "title": "Category" },
+          { "field": "Value", "title": "Separations", "format": "," }
+        ]
+      }
+    },
+    {
+      "data": { "values": [] },
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "middle",
+        "font": "Arial",
+        "fontSize": 11,
+        "fontWeight": "bold",
+        "color": "#6b7b80"
+      },
+      "encoding": {
+        "x": { "field": "X", "type": "quantitative", "scale": { "domain": [0, 1120], "range": [0, 1120] }, "axis": null },
+        "y": { "field": "Y", "type": "quantitative", "scale": { "domain": [0, 520], "range": [0, 520] }, "axis": null },
+        "text": { "field": "Label" }
+      }
+    }
+  ],
+  "config": { "view": { "stroke": null } }
+}

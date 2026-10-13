@@ -1,0 +1,61 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Same-day and overnight separations",
+    "anchor": "start",
+    "font": "Arial",
+    "fontSize": 15,
+    "color": "#21333a"
+  },
+  "data": {
+    "url": "data/same-day-overnight.csv",
+    "format": { "type": "csv" }
+  },
+  "width": "container",
+  "height": 290,
+  "mark": { "type": "bar", "cornerRadiusTopLeft": 4, "cornerRadiusTopRight": 4 },
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "ordinal",
+      "title": null,
+      "axis": { "labelAngle": 0 }
+    },
+    "xOffset": {
+      "field": "AdmissionStatus",
+      "sort": ["Same-day", "Overnight"]
+    },
+    "y": {
+      "field": "Separations",
+      "type": "quantitative",
+      "title": "Separations",
+      "axis": { "format": "~s" }
+    },
+    "color": {
+      "field": "AdmissionStatus",
+      "type": "nominal",
+      "title": null,
+      "scale": {
+        "domain": ["Same-day", "Overnight"],
+        "range": ["#187b79", "#d77b45"]
+      },
+      "legend": { "orient": "bottom" }
+    },
+    "tooltip": [
+      { "field": "Year", "title": "Financial year" },
+      { "field": "AdmissionStatus", "title": "Admission status" },
+      { "field": "Separations", "title": "Separations", "format": "," }
+    ]
+  },
+  "config": {
+    "view": { "stroke": null },
+    "axis": {
+      "gridColor": "#edf1ef",
+      "labelColor": "#6b7b80",
+      "titleColor": "#6b7b80",
+      "labelFont": "Arial",
+      "titleFont": "Arial"
+    },
+    "legend": { "labelFont": "Arial", "labelColor": "#6b7b80" }
+  }
+}
