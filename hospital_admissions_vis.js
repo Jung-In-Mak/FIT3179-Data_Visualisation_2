@@ -108,13 +108,13 @@ async function embedSpec(containerId, specPath, prepare) {
 }
 
 function splitBalanced(items) {
-    const total = items.reduce((sum, item) => sum + item.value, 0);
+    const total = items.reduce((sum, item) => sum + item.Admissions, 0);
     let running = 0;
     let splitAt = 1;
     let bestDifference = total;
 
     for (let index = 1; index < items.length; index += 1) {
-        running += items[index - 1].value;
+        running += items[index - 1].Admissions;
         const difference = Math.abs(total / 2 - running);
         if (difference < bestDifference) {
             bestDifference = difference;
@@ -133,8 +133,8 @@ function layoutTreemap(items, x, y, width, height, output) {
     }
 
     const [first, second] = splitBalanced(items);
-    const total = items.reduce((sum, item) => sum + item.value, 0);
-    const firstValue = first.reduce((sum, item) => sum + item.value, 0);
+    const total = items.reduce((sum, item) => sum + item.Admissions, 0);
+    const firstValue = first.reduce((sum, item) => sum + item.Admissions, 0);
     const fraction = firstValue / total;
 
     if (width >= height) {
