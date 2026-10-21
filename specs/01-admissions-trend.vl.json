@@ -45,9 +45,13 @@
       "field": "Sector",
       "type": "nominal",
       "title": "Hospital sector",
+      "legend": {
+        "orient": "bottom",
+        "direction": "horizontal"
+      },
       "scale": {
         "domain": ["Public Hospitals", "Private Hospitals"],
-        "range": ["#187b79", "#d77b45"]
+        "range": ["#AA4499", "#d77b45"]
       }
     },
     "opacity": {

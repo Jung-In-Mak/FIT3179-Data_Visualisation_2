@@ -1,0 +1,40 @@
+{
+  "chart": {
+    "title": "Hospital beds per 1,000 people",
+    "subtitle": "Hospital beds include inpatient beds available in public, private, general, and specialized hospitals and rehabilitation centers. In most cases beds for both acute and chronic care are included.",
+    "citation": "World Health Organization (WHO) data, via World Bank (2026)",
+    "originalChartUrl": "https://ourworldindata.org/grapher/hospital-beds-per-1000-people?time=2021&v=1&csvType=filtered&useColumnShortNames=false",
+    "selection": [
+      "Costa Rica",
+      "United States",
+      "United Kingdom",
+      "Germany",
+      "Italy",
+      "India",
+      "South Africa",
+      "France",
+      "Spain",
+      "Ireland"
+    ]
+  },
+  "columns": {
+    "Hospital beds (per 1,000 people)": {
+      "titleShort": "Hospital beds (per 1,000 people)",
+      "titleLong": "Hospital beds (per 1,000 people)",
+      "unit": "per 1,000 people",
+      "timespan": "1960-2023",
+      "type": "Numeric",
+      "owidVariableId": 1294572,
+      "shortName": "sh_med_beds_zs",
+      "lastUpdated": "2026-07-27",
+      "nextUpdate": "2027-01-23",
+      "citationShort": "World Health Organization (WHO) data, via World Bank (2026) – processed by Our World in Data",
+      "citationLong": "World Health Organization (WHO) data, via World Bank (2026) – processed by Our World in Data. “Hospital beds (per 1,000 people)” [dataset]. World Health Organization (WHO) data, via World Bank, “World Development Indicators 129” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/1294572.metadata.json"
+    }
+  },
+  "dateDownloaded": "2026-10-19",
+  "activeFilters": {
+    "time": "2021"
+  }
+}

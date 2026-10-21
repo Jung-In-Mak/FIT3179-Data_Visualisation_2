@@ -1,14 +1,14 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Mental health separations by age and sex",
+    "text": "Total hospital separations by age and sex",
     "anchor": "start",
     "font": "Arial",
     "fontSize": 15,
     "color": "#21333a"
   },
   "data": {
-    "url": "data/mental-health-age-sex.csv",
+    "url": "data/separations-age-sex.csv",
     "format": { "type": "csv" }
   },
   "transform": [
@@ -31,11 +31,12 @@
     "x": {
       "field": "SignedSeparations",
       "type": "quantitative",
-      "title": "Separations (equal scale on each side)",
-      "scale": { "domain": [-40000, 40000] },
+      "title": "Separations",
+      "scale": { "domain": [-800000, 800000] },
       "axis": {
-        "labelExpr": "abs(datum.value)",
+        "labelExpr":"format(abs(datum.value) / 1000, '.0f') + 'k'",
         "format": "~s",
+        "tickCount": 17,
         "gridColor": "#edf1ef"
       }
     },
@@ -45,14 +46,14 @@
       "title": null,
       "scale": {
         "domain": ["Males", "Females"],
-        "range": ["#187b79", "#d77b45"]
+        "range": ["#88CCEE", "#882255"]
       },
       "legend": { "orient": "bottom" }
     },
     "tooltip": [
       { "field": "AgeGroup", "title": "Age group" },
       { "field": "Sex", "title": "Sex" },
-      { "field": "Separations", "title": "Mental health separations", "format": "," }
+      { "field": "Separations", "title": "Separations", "format": "," }
     ]
   },
   "config": {

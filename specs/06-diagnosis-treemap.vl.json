@@ -27,20 +27,11 @@
     },
     {
       "transform": [{ "filter": "datum.Label !== ''" }],
-      "mark": { "type": "text", "align": "left", "baseline": "middle", "font": "Arial", "fontSize": 12, "fontWeight": 600, "color": "white", "limit": 170 },
+      "mark": { "type": "text", "align": "left", "baseline": "middle", "font": "Arial", "fontSize": 15, "fontWeight": 600, "color": "white" },
       "encoding": {
         "x": { "field": "LabelX", "type": "quantitative", "scale": { "domain": [0, 940], "range": [0, 940] }, "axis": null },
         "y": { "field": "LabelY", "type": "quantitative", "scale": { "domain": [0, 480], "range": [0, 480] }, "axis": null },
         "text": { "field": "Label" }
-      }
-    },
-    {
-      "transform": [{ "filter": "datum.ValueLabel !== ''" }],
-      "mark": { "type": "text", "align": "left", "baseline": "bottom", "font": "Arial", "fontSize": 10, "color": "#edf5f1", "limit": 170 },
-      "encoding": {
-        "x": { "field": "LabelX", "type": "quantitative", "scale": { "domain": [0, 940], "range": [0, 940] }, "axis": null },
-        "y": { "field": "ValueY", "type": "quantitative", "scale": { "domain": [0, 480], "range": [0, 480] }, "axis": null },
-        "text": { "field": "ValueLabel" }
       }
     }
   ],

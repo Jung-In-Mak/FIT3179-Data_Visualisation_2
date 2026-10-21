@@ -40,7 +40,7 @@
       "title": "Hospital sector",
       "scale": {
         "domain": ["Public hospitals", "Private hospitals"],
-        "range": ["#187b79", "#d77b45"]
+        "range": ["#AA4499", "#d77b45"]
       },
       "legend": { "orient": "bottom" }
     },

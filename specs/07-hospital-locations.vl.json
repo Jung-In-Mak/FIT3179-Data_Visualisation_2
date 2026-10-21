@@ -8,7 +8,7 @@
     "color": "#21333a"
   },
   "width": "container",
-  "height": 350,
+  "height": 430,
   "projection": { "type": "mercator" },
   "layer": [
     {
@@ -16,7 +16,7 @@
         "url": "data/australian-states.geojson",
         "format": { "type": "json", "property": "features" }
       },
-      "mark": { "type": "geoshape", "fill": "#e6eeea", "stroke": "#9fb2ac", "strokeWidth": 0.7 }
+      "mark": { "type": "geoshape", "fill": "#f3f6f4", "stroke": "#939b98", "strokeWidth": 1 }
     },
     {
       "data": {
@@ -28,7 +28,7 @@
         "filled": true,
         "size": 25,
         "opacity": 0.62,
-        "color": "#c2644c",
+        "color": "#14746f",
         "stroke": "#ffffff",
         "strokeWidth": 0.3
       },

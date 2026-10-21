@@ -1,56 +1,47 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "A tile for each state's share of public hospital separations",
+    "text": "Public hospital separations by state",
     "anchor": "start",
     "font": "Arial",
     "fontSize": 15,
     "color": "#21333a"
   },
   "data": { "values": [] },
-  "width": 920,
-  "height": 565,
+  "width": "container",
+  "height": 300,
+  "projection": { "type": "mercator" },
   "layer": [
     {
-      "mark": { "type": "rect", "stroke": "#ffffff", "strokeWidth": 3, "cornerRadius": 8 },
+      "data": { "values": [] },
+      "mark": { "type": "geoshape", "fill": "#f3f6f4", "stroke": "#939b98", "strokeWidth": 1 },
+      "encoding": {}
+    },
+    {
+      "data": { "values": [] },
+      "mark": {
+        "type": "image",
+        "url": "./data/hospital.png",
+        "aspect": true,
+        "align": "center",
+        "baseline": "middle",
+        "width": 1,
+        "height": 1
+      },
       "encoding": {
-        "x": { "field": "x", "type": "quantitative", "scale": { "domain": [0, 920], "range": [0, 920] }, "axis": null },
-        "x2": { "field": "x2" },
-        "y": { "field": "y", "type": "quantitative", "scale": { "domain": [0, 565], "range": [0, 565] }, "axis": null },
-        "y2": { "field": "y2" },
-        "color": {
-          "field": "RatePer1000",
-          "type": "quantitative",
-          "title": "Separations per 1,000",
-          "scale": { "scheme": "redyellowblue", "reverse": true, "domain": [200, 700] },
-          "legend": { "orient": "bottom", "format": ".0f" }
-        },
+        "longitude": { "field": "Longitude", "type": "quantitative" },
+        "latitude": { "field": "Latitude", "type": "quantitative" },
         "tooltip": [
           { "field": "State", "title": "State or territory" },
           { "field": "Admissions", "title": "Public separations", "format": "," },
           { "field": "RatePer1000", "title": "Separations per 1,000", "format": ".1f" }
         ]
       }
-    },
-    {
-      "mark": { "type": "text", "font": "Arial", "fontSize": 15, "fontWeight": "bold", "color": "white" },
-      "encoding": {
-        "x": { "field": "LabelX", "type": "quantitative", "scale": { "domain": [0, 920], "range": [0, 920] }, "axis": null },
-        "y": { "field": "LabelY", "type": "quantitative", "scale": { "domain": [0, 565], "range": [0, 565] }, "axis": null },
-        "text": { "field": "Code" }
-      }
-    },
-    {
-      "mark": { "type": "text", "font": "Arial", "fontSize": 10, "color": "white", "dy": 14 },
-      "encoding": {
-        "x": { "field": "LabelX", "type": "quantitative", "scale": { "domain": [0, 920], "range": [0, 920] }, "axis": null },
-        "y": { "field": "LabelY", "type": "quantitative", "scale": { "domain": [0, 565], "range": [0, 565] }, "axis": null },
-        "text": { "field": "CountLabel" }
-      }
     }
   ],
   "config": {
     "view": { "stroke": null },
+    "axis": null,
     "legend": {
       "labelColor": "#6b7b80",
       "titleColor": "#21333a",

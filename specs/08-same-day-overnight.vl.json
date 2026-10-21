@@ -1,35 +1,30 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Same-day and overnight separations",
+    "text": "Same-day and overnight separations, 2024–25",
     "anchor": "start",
     "font": "Arial",
     "fontSize": 15,
     "color": "#21333a"
   },
-  "data": {
-    "url": "data/same-day-overnight.csv",
-    "format": { "type": "csv" }
-  },
+  "data": { "values": [] },
   "width": "container",
-  "height": 290,
-  "mark": { "type": "bar", "cornerRadiusTopLeft": 4, "cornerRadiusTopRight": 4 },
+  "height": 310,
+  "mark": { "type": "rect", "cornerRadius": 2, "stroke": "#ffffff", "strokeWidth": 2 },
   "encoding": {
     "x": {
-      "field": "Year",
+      "field": "Column",
       "type": "ordinal",
-      "title": null,
-      "axis": { "labelAngle": 0 }
-    },
-    "xOffset": {
-      "field": "AdmissionStatus",
-      "sort": ["Same-day", "Overnight"]
+      "sort": "ascending",
+      "axis": null,
+      "scale": { "paddingInner": 0.12, "paddingOuter": 0.05 }
     },
     "y": {
-      "field": "Separations",
-      "type": "quantitative",
-      "title": "Separations",
-      "axis": { "format": "~s" }
+      "field": "Row",
+      "type": "ordinal",
+      "sort": "descending",
+      "axis": null,
+      "scale": { "paddingInner": 0.12, "paddingOuter": 0.05 }
     },
     "color": {
       "field": "AdmissionStatus",
@@ -37,14 +32,15 @@
       "title": null,
       "scale": {
         "domain": ["Same-day", "Overnight"],
-        "range": ["#187b79", "#d77b45"]
+        "range": ["#14746f", "#d77b45"]
       },
-      "legend": { "orient": "bottom" }
+      "legend": { "orient": "bottom", "direction": "horizontal", "labelLimit": 360 }
     },
     "tooltip": [
       { "field": "Year", "title": "Financial year" },
       { "field": "AdmissionStatus", "title": "Admission status" },
-      { "field": "Separations", "title": "Separations", "format": "," }
+      { "field": "Separations", "title": "Separations", "format": "," },
+      { "field": "SharePercent", "title": "Share of separations (%)", "format": ".1f" }
     ]
   },
   "config": {

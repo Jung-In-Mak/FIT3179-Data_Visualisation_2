@@ -19,24 +19,29 @@
       "mark": { "type": "geoshape", "fill": "#edf1ef", "stroke": "#c2cfca", "strokeWidth": 0.7 }
     },
     {
-      "data": { "values": { "type": "FeatureCollection", "features": [] } },
+      "data": { "values": [] },
       "mark": {
-        "type": "geoshape",
+        "type": "point",
+        "shape": "square",
+        "filled": true,
+        "size": 180,
         "stroke": "#ffffff",
         "strokeWidth": 0.5,
-        "opacity": 0.78
+        "opacity": 0.82
       },
       "encoding": {
+        "longitude": { "field": "Longitude", "type": "quantitative" },
+        "latitude": { "field": "Latitude", "type": "quantitative" },
         "color": {
-          "field": "properties.Count",
+          "field": "Count",
           "type": "quantitative",
           "title": "Hospitals per grid cell",
           "scale": { "scheme": "orangered" },
           "legend": { "orient": "bottom", "format": "d" }
         },
         "tooltip": [
-          { "field": "properties.Count", "title": "Hospital locations in cell" },
-          { "field": "properties.Facilities", "title": "Examples" }
+          { "field": "Count", "title": "Hospital locations in cell", "format": "," },
+          { "field": "Facilities", "title": "Examples" }
         ]
       }
     }
