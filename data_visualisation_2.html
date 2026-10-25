@@ -6,99 +6,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Jung-In Mak">
     <meta name="description"
-        content="Australia Hosputal Activity Data Visualisation">
+        content="An interactive visual story about Australian hospital activity, patient care and hospital locations.">
     <title>A Five-Year Glance Inside Australia's Changing Hospital Network</title>
-    <link rel="stylesheet" href="healthcare_dashboard.css?v=4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="healthcare_dashboard.css?v=6">
     <!-- Deferred scripts execute after parsing, in order: Vega, Vega-Lite, the embed helper, then this dashboard's renderer. -->
     <script defer src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
-    <script defer src="hospital_admissions_vis.js?v=6"></script>
+    <script defer src="hospital_admissions_vis.js?v=11"></script>
 </head>
 
 <body>
     <header class="hero">
         <div class="hero__inner">
-            <p class="eyebrow">AUSTRALIAN HEALTHCARE · 2020–21 TO 2024–25</p>
             <h1>A Five-Year Glance Inside Australia's Changing Hospital Network</h1>
-            <p class="hero__intro">Hospital use has recovered and grown since the pandemic years. Explore where
+            <p class="hero__intro">Hospital use has recovered and grown since the COVID-19 years. Explore where
                 activity is rising, how care differs across ages and services, and what the national hospital network
                 looks like.</p>
-            <div class="hero__facts" aria-label="Key figures">
-                <div><strong>12.8m</strong><span>hospital separations in 2024–25</span></div>
-                <div><strong>34.3m</strong><span>patient days in 2024–25</span></div>
-                <div><strong>877</strong><span>hospital locations mapped</span></div>
             </div>
-            <p class="hero__date">A national snapshot, using the latest downloaded hospital activity tables available for this project.</p>
-        </div>
     </header>
 
     <main class="page-content">
         <!-- Introduces the narrative and how readers can interact with the charts. -->
         <section class="story-intro" aria-labelledby="story-heading">
-            <p class="eyebrow">THE STORY IN TEN CHARTS</p>
-            <h2 id="story-heading">A larger system, serving different needs in different places</h2>
-            <p>Start with a global comparison of hospital-bed availability, then compare Australian separations by
-                sector and state. The charts that follow explore who receives care, how episodes are delivered, and
-                where hospital locations are concentrated. Counts describe episodes of care, not
-                unique people.</p>
-            <p class="interaction-hint"><strong>Explore:</strong> hover over marks for exact figures. Select a sector in
-                the hospital separations chart's legend to highlight it; use map and chart tooltips to compare places
-                and categories.</p>
+            <p class="interaction-hint"><strong>Explore:</strong> hover over marks for exact figures. Use the Public and Private
+                buttons below to highlight a hospital sector in charts 2, 7 and 9; use map and chart tooltips to compare
+                places and categories.</p>
+            <dl class="glossary" aria-label="Plain-English glossary">
+                <div>
+                    <dt>SEPARATION</dt>
+                    <dd>One completed episode of hospital care, from admission to discharge. One person can have several.</dd>
+                </div>
+                <div>
+                    <dt>PATIENT DAY</dt>
+                    <dd>One day (or part of a day) that a patient spends in hospital. Longer stays add more patient days.</dd>
+                </div>
+                <div>
+                    <dt>RATE PER 1,000</dt>
+                    <dd>How many separations occur for every 1,000 residents, so places of different sizes can be compared fairly.</dd>
+                </div>
+            </dl>
         </section>
 
-        <!-- The four chapters group the ten charts into a guided reading order. -->
+        <!-- One shared control highlights the public or private sector in every chart that splits by sector. -->
+        <div class="sector-control" role="group" aria-label="Highlight a hospital sector">
+            <p class="sector-control__label">Highlight a hospital sector <span>in charts 2, 7 and 9</span></p>
+            <div class="sector-toggle">
+                <button type="button" data-sector="all" aria-pressed="true">Both</button>
+                <button type="button" data-sector="public" aria-pressed="false"><span class="swatch swatch--public" aria-hidden="true"></span>Public</button>
+                <button type="button" data-sector="private" aria-pressed="false"><span class="swatch swatch--private" aria-hidden="true"></span>Private</button>
+            </div>
+        </div>
+
+        <!-- The chapters group the charts into a guided reading order. -->
         <section class="chapter-heading" aria-labelledby="chapter-one">
             <span class="chapter-heading__number">01</span>
             <div>
                 <p class="eyebrow">DEMAND AND PLACE</p>
                 <h2 id="chapter-one">Hospital activity is growing, but not evenly</h2>
+                <p class="chapter-heading__intro">Start with the whole system: how Australia's hospital capacity compares with other countries, how public and private activity has changed since 2020-21, and how public hospital use differs between states and territories.</p>
             </div>
         </section>
 
         <!-- JavaScript targets each chart div by ID; chart definitions live separately in specs/. -->
         <section class="visual-grid" aria-label="Hospital demand and state comparisons">
-            <article class="visual-card visual-card--wide">
-                <div class="visual-card__heading">
-                    <span class="visual-number">01</span>
-                    <div>
-                        <p class="visual-kicker">GLOBAL HEALTH RESOURCES · CHOROPLETH MAP</p>
-                        <h3>Hospital beds per 1,000 people by country</h3>
-                        <p class="visual-deck">Colour represents hospital beds per 1,000 people in the filtered 2021 data.</p>
-                    </div>
+            <article class="visual-card visual-card--wide visual-card--split">
+                <div class="split-chart">
+                    <div id="chart-01-world-beds" class="chart" aria-label="World choropleth map of hospital beds per 1,000 people by country"></div>
                 </div>
-                <div id="chart-state-rates" class="chart" aria-label="World choropleth map of hospital beds per 1,000 people by country"></div>
-                <p class="chart-note">Countries without a reported value are gray. Where the source substitutes a nearby year for 2021, the tooltip shows that original data year.</p>
+                <div class="split-text">
+                    <div class="visual-card__heading">
+                        <span class="visual-number">01</span>
+                        <div>
+                            <h3>Hospital beds per 1,000 people by country</h3>
+                        </div>
+                    </div>
+                    <p class="visual-deck">Australia has 3.8 hospital beds for every 1,000 people, ranking 41 of 141 countries with data.</p>
+                    <p class="visual-deck">Japan, North Korea, and South Korea have the most, at more than 12.5 per 1,000 people (3.4 times Australia's level), while Chad has the fewest, at 0.1.</p>
+                    <p class="chart-note">Countries without a reported value are grey. Where the source substitutes a nearby year for 2021, the tooltip shows that original data year.</p>
+                </div>
             </article>
 
             <article class="visual-card">
                 <div class="visual-card__heading">
                     <span class="visual-number">02</span>
                     <div>
-                        <p class="visual-kicker">FIVE-YEAR TREND · LINE CHART</p>
                         <h3>Hospital separations by sector are rising</h3>
-                        <p class="visual-deck">Both sectors have passed their 2020–21 levels; the two lines can be highlighted from the legend.</p>
+                        <p class="visual-deck">From 2020-21 to 2024-25, public hospital separations rose 10% (to 7.7 million) and private hospital separations rose 5% (to 5.1 million). Public hospitals accounted for 60% of separations in 2024-25.</p>
+                        <p class="visual-deck insight"></p>
                     </div>
                 </div>
-                <div id="chart-admissions" class="chart" aria-label="Interactive line chart of hospital separations by sector"></div>
-                <p class="chart-note">A separation is a completed episode of admitted care. It does not count unique patients.</p>
+                <div id="chart-02-separations-trend" class="chart" aria-label="Interactive line chart of hospital separations by sector"></div>
             </article>
 
             <article class="visual-card">
                 <div class="visual-card__heading">
                     <span class="visual-number">03</span>
                     <div>
-                        <p class="visual-kicker">STATE COMPARISON · PROPORTIONAL SYMBOL MAP</p>
-                        <h3>Public hospital separations are highest in Victoria</h3>
-                        <p class="visual-deck">Hospital symbols are positioned at the centre of each state and territory and scaled by public separations.</p>
+                        <h3>Public hospital use per person differs across states and territories</h3>
+                        <p class="visual-deck">Northern Territory has the highest rate, at 681 public separations per 1,000 people. That is 3.0 times the lowest rate, in Western Australia (229).</p>
+                        <p class="visual-deck insight"></p>
                     </div>
                 </div>
-                <div id="chart-cartogram" class="chart" aria-label="Proportional symbol map of public hospital separations by state"></div>
-                <div class="symbol-legend" aria-label="Map symbol size legend">
-                    <p>Separations</p>
-                    <ul id="state-symbol-legend"></ul>
+                <div class="map-with-legend">
+                    <div id="chart-03-state-separations" class="chart" aria-label="Proportional symbol map of public hospital separations per 1,000 people by state"></div>
+                    <div class="symbol-legend" aria-label="Map symbol size legend">
+                        <p>Public separations per 1,000 people</p>
+                        <ul id="state-symbol-legend"></ul>
+                    </div>
                 </div>
-                <p class="chart-note">Symbols are placed at approximate state and territory geographic centres; they do not show individual hospital locations or within-state activity.</p>
             </article>
 
         </section>
@@ -108,6 +128,7 @@
             <div>
                 <p class="eyebrow">PEOPLE AND CONDITIONS</p>
                 <h2 id="chapter-two">Age and diagnosis shape the need for care</h2>
+                <p class="chapter-heading__intro">Those totals are made up of people with very different needs. The next three charts ask which conditions are treated most often and how age shapes the time people spend in hospital, where older Australians account for a large share.</p>
             </div>
         </section>
 
@@ -116,40 +137,41 @@
                 <div class="visual-card__heading">
                     <span class="visual-number">04</span>
                     <div>
-                        <p class="visual-kicker">DIAGNOSTIC MIX · TREEMAP</p>
                         <h3>Kidney and urinary conditions lead these diagnostic groups</h3>
-                        <p class="visual-deck">Larger rectangles represent more acute separations in 2024–25.</p>
+                        <p class="visual-deck">Kidney and Urinary Tract is the largest diagnostic group, with 2.2 million separations.</p>
+                        <p class="visual-deck">The three largest groups (Kidney and Urinary Tract, Digestive System, and Musculoskeletal System and Connective Tissue) together make up 41% of the acute separations shown.</p>
+                        <p class="visual-deck insight"></p>
                     </div>
                 </div>
-                <div id="chart-diagnoses" class="chart" aria-label="Treemap of hospital separations by major diagnostic group"></div>
-                <p class="chart-note">Groups are Australian Refined Diagnosis Related Groups (AR-DRGs), not ICD-10 chapters. Hover for full names and counts.</p>
+                <div id="chart-04-diagnosis-treemap" class="chart" aria-label="Treemap of hospital separations by major diagnostic group"></div>
             </article>
 
             <article class="visual-card">
                 <div class="visual-card__heading">
                     <span class="visual-number">05</span>
                     <div>
-                        <p class="visual-kicker">AGE AND SEX · POPULATION PYRAMID</p>
                         <h3>Total hospital separations vary across age groups</h3>
-                        <p class="visual-deck">The mirrored bars compare male and female separations across all hospitals in 2024–25.</p>
+                        <p class="visual-deck">Females account for 52% of the separations shown.
+                            Between ages 20 and 39, female separations are significantly higher than male separations, largely because of pregnancy and childbirth.
+                            From age 65 onwards, male separations are higher.</p>
+                        <p class="visual-deck insight"></p>
                     </div>
                 </div>
-                <div id="chart-age-sex" class="chart" aria-label="Population pyramid of total hospital separations by age group and sex"></div>
-                <p class="chart-note">Counts include all types of admitted care and represent episodes, not unique people or population-adjusted rates. Only the male and female categories reported in the source table are shown.</p>
+                <div id="chart-05-age-sex" class="chart" aria-label="Population pyramid of total hospital separations by age group and sex"></div>
             </article>
 
             <article class="visual-card">
                 <div class="visual-card__heading">
                     <span class="visual-number">06</span>
                     <div>
-                        <p class="visual-kicker">AGE AND PATIENT DAYS · HORIZONTAL BARS</p>
                         <h3>Australians aged 65+ account for over half of patient days</h3>
-                        <p class="visual-deck">Bars show the actual number of patient days for each age group in 2024–25.</p>
+                        <p class="visual-deck">People aged 65 and over account for 52% of patient days (17.9 of 34.3 million).
+                            The single largest age group is 75-79 years, with 3.9 million patient days.
+                            The 0-4 age group also has many patient days, largely from care around childbirth in hospital.</p>
+                        <p class="visual-deck insight"></p>
                     </div>
                 </div>
-                <div id="chart-patient-days-age" class="chart" aria-label="Horizontal bar chart of patient days by age group in 2024–25"></div>
-                <p class="chart-note">Bars use a single teal colour. The available age breakdown is for 2024–25 only, so it does not show change over time.</p>
-            </article>
+                <div id="chart-06-patient-days-age" class="chart" aria-label="Horizontal bar chart of patient days by age group in 2024-25"></div>
         </section>
 
         <section class="chapter-heading" aria-labelledby="chapter-three">
@@ -157,6 +179,7 @@
             <div>
                 <p class="eyebrow">HOW CARE IS DELIVERED</p>
                 <h2 id="chapter-three">A hospital episode can mean a visit or a longer stay</h2>
+                <p class="chapter-heading__intro">Time in hospital is only part of the story. These charts separate short visits from longer stays, then follow how public and private hospitals deliver different kinds of care.</p>
             </div>
         </section>
 
@@ -165,108 +188,117 @@
                 <div class="visual-card__heading">
                     <span class="visual-number">07</span>
                     <div>
-                        <p class="visual-kicker">TIME IN CARE · LINE CHART</p>
                         <h3>Public hospitals account for most patient days</h3>
-                        <p class="visual-deck">Patient days count the time patients spend receiving admitted care.</p>
+                        <p class="visual-deck">From 2020-21 to 2024-25, public hospital patient days rose 15% and private hospital patient days rose 1%. 
+                            Public hospitals accounted for 70% of patient days in 2024-25.</p>
+                        <p class="visual-deck insight"></p>
                     </div>
                 </div>
-                <div id="chart-patient-days" class="chart" aria-label="Line chart of patient days by hospital sector"></div>
-                <p class="chart-note">Patient days are not the same as separations: one overnight episode can contribute several days.</p>
+                <div id="chart-07-patient-days-sector" class="chart" aria-label="Line chart of patient days by hospital sector"></div>
             </article>
 
             <article class="visual-card">
                 <div class="visual-card__heading">
                     <span class="visual-number">08</span>
                     <div>
-                        <p class="visual-kicker">SAME-DAY OR OVERNIGHT · WAFFLE CHART</p>
                         <h3>Same-day care makes up most separations</h3>
-                        <p class="visual-deck">Each square represents about 1% of separations in 2024–25.</p>
+                        <p class="visual-deck">Same-day stays made up 64% of separations (8.2 of 12.8 million), almost double the share of overnight stays (36%).
+                            This may reflect more patients having less serious episodes that do not need an overnight stay.</p>
+                        <p class="visual-deck insight"></p>
                     </div>
                 </div>
-                <div id="chart-admission-type" class="chart" aria-label="Waffle chart comparing same-day and overnight separations in 2024–25"></div>
-                <p class="chart-note">Hover over a square for the exact count and share. Totals include both public and private hospitals.</p>
+                <div id="chart-08-same-day-overnight" class="chart" aria-label="Waffle chart comparing same-day and overnight separations in 2024-25"></div>
             </article>
 
             <article class="visual-card visual-card--wide">
                 <div class="visual-card__heading">
                     <span class="visual-number">09</span>
                     <div>
-                        <p class="visual-kicker">FROM SECTOR TO SERVICE · ALLUVIAL FLOW</p>
                         <h3>Hospital sectors provide a different mix of services</h3>
-                        <p class="visual-deck">Weighted links trace 2024–25 separations from public or private hospitals through broad care categories to service types.</p>
+                        <p class="visual-deck">Non-emergency care is the largest service type, accounting for 54% of separations in public hospitals and 82% in private hospitals.
+                            Most public hospital services are medical (70%), while private hospital services are more spread out.
+                            Public hospitals account for 77% of childbirths, while private hospitals account for 82% of rehabilitation.</p>
+                        <p class="visual-deck insight"></p>
                     </div>
                 </div>
-                <div id="chart-patient-flow" class="chart service-flow-chart" aria-label="Alluvial flow chart from hospital sector to service category and service type"></div>
-                <p class="chart-note">This is an aggregate flow of episodes, not linked records of individual patients or their discharge destinations.</p>
+                <div id="chart-09-service-flow" class="chart service-flow-chart" aria-label="Sankey diagram from hospital sector to service type and broad care category"></div>
             </article>
         </section>
 
         <section class="chapter-heading" aria-labelledby="chapter-four">
             <span class="chapter-heading__number">04</span>
             <div>
-                <p class="eyebrow">HOSPITAL LOCATIONS</p>
-                <h2 id="chapter-four">The hospital network spans population centres and remote regions</h2>
+                <p class="eyebrow">WHERE HOSPITALS AND PATIENTS ARE</p>
+                <h2 id="chapter-four">Hospitals follow the population, yet remote residents use them most</h2>
+                <p class="chapter-heading__intro">Finally, the story moves from what hospitals do to where they are. Hospital locations cluster where people live, but when each area's population is taken into account, residents of very remote areas have the highest rates of hospital use.</p>
             </div>
         </section>
 
         <section class="visual-grid" aria-label="Hospital locations">
-            <article class="visual-card visual-card--wide">
-                <div class="visual-card__heading">
-                    <span class="visual-number">10</span>
-                    <div>
-                        <p class="visual-kicker">THE HOSPITAL NETWORK · DOT MAP</p>
-                        <h3>Hospitals cluster around Australia's population centres</h3>
-                        <p class="visual-deck">Each dot marks a hospital location recorded by Geoscience Australia.</p>
-                    </div>
+            <article class="visual-card visual-card--wide visual-card--split">
+                <div class="split-chart">
+                    <div id="chart-10-hospital-locations" class="chart" aria-label="Dot map of Australian hospital locations"></div>
                 </div>
-                <div id="chart-facilities" class="chart" aria-label="Dot map of Australian hospital locations"></div>
-                <p class="chart-note">The map shows facility locations only, not capacity, services delivered or patient catchments.</p>
+                <div class="split-text">
+                    <div class="visual-card__heading">
+                        <span class="visual-number">10</span>
+                        <div>
+                            <h3>Hospitals cluster around Australia's population centres</h3>
+                        </div>
+                    </div>
+                    <p class="visual-deck">New South Wales has the most hospital locations (287 of 877). New South Wales, Queensland and Victoria together hold 75% of all mapped hospitals.
+                        Most hospitals are on the east coast, where most Australians live.</p>
+                    <p class="visual-deck insight"></p>
+                </div>
+            </article>
+
+            <article class="visual-card visual-card--wide visual-card--split visual-card--split-reverse">
+                <div class="split-text">
+                    <div class="visual-card__heading">
+                        <span class="visual-number">11</span>
+                        <div>
+                            <h3>Hospital use is highest among people living in very remote areas</h3>
+                        </div>
+                    </div>
+                    <p class="visual-deck">In 2023-24, very remote areas had 817 separations per 1,000 people, double the rate in major cities (410). 
+                        In every year shown, hospital use is higher in remote and very remote areas than in cities and regional areas.
+                        The biggest step is from remote to very remote areas, where rates differ by 185 to 303 separations per 1,000 people across the years.</p>
+                    <p class="visual-deck insight"></p>
+                </div>
+                <div class="split-chart">
+                    <div id="chart-11-separations-remoteness" class="chart" aria-label="Matrix heatmap of hospital separations per 1,000 people by remoteness area and year"></div>
+                </div>
             </article>
         </section>
 
-        <!-- Methodology and source notes provide context and limitations for interpreting the visualisations. -->
-        <section class="methods" aria-labelledby="methods-heading">
-            <p class="eyebrow">THE QUESTION AND THE METHOD</p>
-            <h2 id="methods-heading">What, who, why and how</h2>
-            <div class="methods-grid">
-                <article>
-                    <h3>Domain and why</h3>
-                    <p>Australian admitted hospital care. This page helps a general Australian audience compare how hospital activity has changed, how care differs by age and service, and how facilities are distributed.</p>
-                </article>
-                <article>
-                    <h3>Who</h3>
-                    <p>Residents and students who want an accessible overview of the national hospital system without needing clinical or statistical training.</p>
-                </article>
-                <article>
-                    <h3>What</h3>
-                    <p>Recent AIHW hospital separations, patient days and service groups, combined with ABS population estimates and Geoscience Australia hospital locations. Source table numbers and downloads are listed below.</p>
-                </article>
-                <article>
-                    <h3>How</h3>
-                    <p>Lines reveal change over time; maps compare place and facility concentration; the population pyramid compares separations by age and sex; area and flow diagrams summarise diagnosis mix and service pathways. Tooltips provide exact values without hiding the main story.</p>
-                </article>
-            </div>
+        <section class="conclusion" aria-labelledby="conclusion-heading">
+            <p class="eyebrow">WHAT THE CHARTS ADD UP TO</p>
+            <h2 id="conclusion-heading">A growing system, used most by older Australians and by people far from cities</h2>
+            <p>Both public and private hospitals are providing more episodes of care than in 2020-21, and most episodes are short, same-day visits. Older Australians account for a large share of the time spent in hospital, hospitals cluster where people live, and residents of very remote areas have the highest rates of use. Taken together, hospital demand depends on who people are and where they live, not only on how many people there are.</p>
         </section>
 
         <section class="sources" aria-labelledby="sources-heading">
             <p class="eyebrow">DATA, METHODS AND ATTRIBUTION</p>
             <h2 id="sources-heading">Sources and limits</h2>
             <ul>
-                <li><a href="https://www.aihw.gov.au/hospitals/topics/admitted-patient-care" target="_blank" rel="noopener noreferrer">AIHW admitted patient care</a> — activity tables 2.1–2.9, including five-year separations, patient days and length of stay.</li>
-                <li><a href="data/3-admitted-patient-care-2024-25-tables-access.xlsx">AIHW 2024–25 access tables</a> — table 3.1 (all-hospital separations and patient days by age group and sex); used for the population pyramid.</li>
-                <li><a href="https://www.aihw.gov.au/getmedia/f7ce8789-cc87-40d0-b736-700b73207108/5-admitted-patient-care-2024-25-tables-services-provided.xlsx" target="_blank" rel="noopener noreferrer">AIHW 2024–25 services provided tables</a> — table 5.1 (service flows) and table 5.3 (diagnostic groups).</li>
+                <li><a href="https://www.aihw.gov.au/hospitals/topics/admitted-patient-care" target="_blank" rel="noopener noreferrer">AIHW admitted patient care</a> — activity tables 2.1-2.9, including five-year separations, patient days and length of stay.</li>
+                <li><a href="data/3-admitted-patient-care-2024-25-tables-access.xlsx">AIHW 2024-25 access tables</a> — table 3.1 (all-hospital separations and patient days by age group and sex); used for the population pyramid.</li>
+                <li><a href="https://www.aihw.gov.au/reports/rural-and-remote-health/k13-data" target="_blank" rel="noopener noreferrer">AIHW Rural and remote health</a> — table S9 (hospitalisations per 1,000 people by remoteness area of usual residence, 2013-14 to 2023-24); used for the separations-remoteness heatmap.</li>
+                <li><a href="https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/jun-2025" target="_blank" rel="noopener noreferrer">Australian Bureau of Statistics, National, state and territory population, June 2025</a> — estimated resident populations used to calculate state separation rates per 1,000 residents.</li>
+                <li><a href="https://www.aihw.gov.au/getmedia/f7ce8789-cc87-40d0-b736-700b73207108/5-admitted-patient-care-2024-25-tables-services-provided.xlsx" target="_blank" rel="noopener noreferrer">AIHW 2024-25 services provided tables</a> — table 5.1 (service flows) and table 5.3 (diagnostic groups).</li>
                 <li><a href="https://ourworldindata.org/grapher/hospital-beds-per-1000-people?time=2021&amp;v=1&amp;csvType=filtered&amp;useColumnShortNames=false" target="_blank" rel="noopener noreferrer">Our World in Data, hospital beds per 1,000 people</a> — 2021 country data, based on World Health Organization data via World Bank (2026), CC BY 4.0.</li>
-                <li><a href="https://github.com/nvkelso/natural-earth-vector" target="_blank" rel="noopener noreferrer">Natural Earth, Admin 0 countries, 1:110m</a> — world-country geometry for the hospital-bed choropleth.</li>
+                <li><a href="https://www.naturalearthdata.com/downloads/110m-cultural-vectors/110m-admin-0-countries/" target="_blank" rel="noopener noreferrer">Natural Earth, Admin 0 countries, 1:110m</a> — world-country geometry for the hospital-bed choropleth.</li>
                 <li><a href="https://services.ga.gov.au/gis/rest/services/National_HealthDirect_Health_Facilities/MapServer" target="_blank" rel="noopener noreferrer">Geoscience Australia, National HealthDirect Health Facilities MapServer</a> — 877 mapped hospital locations; © Commonwealth of Australia 2025, CC BY 4.0.</li>
                 <li><a href="https://github.com/rowanhogan/australian-states" target="_blank" rel="noopener noreferrer">Australian state boundary GeoJSON</a> — map outlines supplied by rowanhogan.</li>
+                <li><a href="https://www.flaticon.com/free-icons/hospital" target="_blank" rel="noopener noreferrer">Hospital icons on Flaticon</a> — created by Magnific; used as the symbols in the state proportional symbol map (chart 3).</li>
             </ul>
-            <p class="source-note">The hospital-bed choropleth shows the filtered 2021 international data; country values may use a nearby source year, shown in tooltips. Countries without a matching observation are gray. The proportional symbol map uses reported Australian state totals and approximate geographic centres. AIHW tables and local CSV extracts are in the <code>data/</code> folder; Vega-Lite specifications are in <code>specs/</code>, and the alluvial flow is rendered as SVG by the dashboard script.</p>
-            <p class="source-note">Generative AI was used to assist with code and copy editing. The author is responsible for reviewing the data, source attributions and final visualisation.</p>
+            <p class="source-note">Data are from 2024-25 financial year unless specified. The hospital-bed choropleth shows filtered 2021 international data; country values may use a nearby reporting year shown in tooltips, and countries without a matching observation are grey. State symbols are placed at approximate geographic centres. The remoteness heatmap (chart 11) covers 2013-14 to 2023-24, so it ends one year before the 2024-25 charts. Local CSV and GeoJSON extracts are in <code>data/</code>; Vega-Lite and Vega specifications are in <code>specs/</code>.</p>
+            <p class="source-note">Generative AI was used to assist with code, chart specifications and copy editing. The author is responsible for reviewing the data, source attributions and final visualisation.</p>
         </section>
     </main>
 
     <footer class="footer">
-        <p>FIT3179 · Data Visualisation 2 · Jung-In Mak · 12 October 2026</p>
+        <p>FIT3179 · Data Visualisation 2 · Jung-In Mak · Updated 21 October 2026</p>
     </footer>
 </body>
 

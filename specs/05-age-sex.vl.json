@@ -1,0 +1,124 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "data/separations-age-sex.csv",
+    "format": {
+      "type": "csv"
+    }
+  },
+  "transform": [
+    {
+      "calculate": "datum.Sex === 'Males' ? -toNumber(datum.Separations) : toNumber(datum.Separations)",
+      "as": "SignedSeparations"
+    }
+  ],
+  "width": "container",
+  "height": 440,
+  "mark": {
+    "type": "bar",
+    "cornerRadiusEnd": 2
+  },
+  "encoding": {
+    "y": {
+      "field": "AgeGroup",
+      "type": "ordinal",
+      "sort": [
+        "0-4",
+        "5-9",
+        "10-14",
+        "15-19",
+        "20-24",
+        "25-29",
+        "30-34",
+        "35-39",
+        "40-44",
+        "45-49",
+        "50-54",
+        "55-59",
+        "60-64",
+        "65-69",
+        "70-74",
+        "75-79",
+        "80-84",
+        "85-89",
+        "90-94",
+        "95+"
+      ],
+      "title": "Age group (years)",
+      "axis": {
+        "labelColor": "#6b7b80",
+        "titleColor": "#6b7b80"
+      }
+    },
+    "x": {
+      "field": "SignedSeparations",
+      "type": "quantitative",
+      "title": "Separations",
+      "scale": {
+        "domain": [
+          -800000,
+          800000
+        ]
+      },
+      "axis": {
+        "labelExpr": "format(abs(datum.value) / 1000, '.0f') + 'k'",
+        "format": "~s",
+        "tickCount": 9,
+        "gridColor": "#f1eded"
+      }
+    },
+    "color": {
+      "field": "Sex",
+      "type": "nominal",
+      "title": null,
+      "scale": {
+        "domain": [
+          "Males",
+          "Females"
+        ],
+        "range": [
+          "#88CCEE",
+          "#aa1616"
+        ]
+      },
+      "legend": {
+        "orient": "bottom"
+      }
+    },
+    "tooltip": [
+      {
+        "field": "AgeGroup",
+        "title": "Age group"
+      },
+      {
+        "field": "Sex",
+        "title": "Sex"
+      },
+      {
+        "field": "Separations",
+        "title": "Separations",
+        "format": ","
+      }
+    ]
+  },
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelColor": "#6b7b80",
+      "titleColor": "#6b7b80",
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "titleFont": "Public Sans, Arial, sans-serif",
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "legend": {
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "labelColor": "#6b7b80",
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "font": "Public Sans, Arial, sans-serif"
+  }
+}

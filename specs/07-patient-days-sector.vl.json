@@ -1,0 +1,143 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "data/patient-days-sector.csv",
+    "format": {
+      "type": "csv"
+    }
+  },
+  "width": "container",
+  "height": 270,
+  "padding": {
+    "left": 5,
+    "top": 24,
+    "right": 20,
+    "bottom": 5
+  },
+  "params": [
+    {
+      "name": "sectorFocus",
+      "value": "all"
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "ordinal",
+      "title": "Year",
+      "axis": {
+        "labelAngle": 0,
+        "labelOverlap": "parity"
+      }
+    },
+    "y": {
+      "field": "PatientDays",
+      "type": "quantitative",
+      "title": "Patient days",
+      "axis": {
+        "format": "~s"
+      }
+    },
+    "color": {
+      "field": "Sector",
+      "type": "nominal",
+      "title": "Hospital sector",
+      "scale": {
+        "domain": [
+          "Public hospitals",
+          "Private hospitals"
+        ],
+        "range": [
+          "#AA4499",
+          "#b7c043"
+        ]
+      },
+      "legend": {
+        "orient": "bottom"
+      }
+    },
+    "tooltip": [
+      {
+        "field": "Year",
+        "title": "Financial year"
+      },
+      {
+        "field": "Sector",
+        "title": "Hospital sector"
+      },
+      {
+        "field": "PatientDays",
+        "title": "Patient days",
+        "format": ","
+      }
+    ],
+    "opacity": {
+      "condition": {
+        "test": "sectorFocus === 'all' || indexof(lower(datum.Sector), sectorFocus) === 0",
+        "value": 1
+      },
+      "value": 0.18
+    }
+  },
+  "layer": [
+    {
+      "transform": [
+        {
+          "filter": "datum.Sector !== 'All hospitals'"
+        }
+      ],
+      "mark": {
+        "type": "line",
+        "point": {
+          "filled": true,
+          "size": 65
+        },
+        "strokeWidth": 3
+      }
+    },
+    {
+      "data": {
+        "values": []
+      },
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "baseline": "bottom",
+        "fontSize": 15,
+        "fontWeight": 700,
+        "color": "#21333a",
+        "dy": -12,
+        "dx": 6
+      },
+      "encoding": {
+        "text": {
+          "field": "Label"
+        },
+        "color": {
+          "value": "#21333a"
+        }
+      }
+    }
+  ],
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "gridColor": "#edf1ef",
+      "labelColor": "#6b7b80",
+      "titleColor": "#6b7b80",
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "titleFont": "Public Sans, Arial, sans-serif",
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "legend": {
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "labelColor": "#6b7b80",
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "font": "Public Sans, Arial, sans-serif"
+  }
+}

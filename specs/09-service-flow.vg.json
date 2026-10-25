@@ -1,0 +1,246 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Hospital separations flow from hospital sector through broad category to service type.",
+  "width": 1120,
+  "height": 520,
+  "padding": 0,
+  "data": [
+    {
+      "name": "links",
+      "values": []
+    },
+    {
+      "name": "nodes",
+      "values": []
+    },
+    {
+      "name": "stageLabels",
+      "values": [
+        {
+          "Label": "HOSPITAL SECTOR",
+          "X": 167
+        },
+        {
+          "Label": "SERVICE TYPE",
+          "X": 497
+        },
+        {
+          "Label": "BROAD CATEGORY",
+          "X": 827
+        }
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "type": "path",
+      "from": {
+        "data": "links"
+      },
+      "encode": {
+        "update": {
+          "path": {
+            "field": "Path"
+          },
+          "fill": {
+            "field": "Color"
+          },
+          "fillOpacity": [
+            {
+              "test": "sectorFocus === 'all' || indexof(lower(datum.Sector), sectorFocus) === 0",
+              "value": 0.62
+            },
+            {
+              "value": 0.08
+            }
+          ],
+          "tooltip": {
+            "signal": "datum.Tooltip"
+          }
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {
+        "data": "nodes"
+      },
+      "encode": {
+        "update": {
+          "x": {
+            "field": "X"
+          },
+          "x2": {
+            "field": "X2"
+          },
+          "y": {
+            "field": "Y"
+          },
+          "y2": {
+            "field": "Y2"
+          },
+          "fill": {
+            "field": "Color"
+          },
+          "tooltip": {
+            "signal": "datum.Tooltip"
+          },
+          "opacity": [
+            {
+              "test": "datum.Column !== 0 || sectorFocus === 'all' || indexof(lower(datum.Name), sectorFocus) === 0",
+              "value": 1
+            },
+            {
+              "value": 0.25
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "nodes"
+      },
+      "aria": false,
+      "encode": {
+        "update": {
+          "x": {
+            "signal": "datum.Column === 0 ? datum.X - 10 : datum.LabelX"
+          },
+          "y": {
+            "field": "LabelY"
+          },
+          "text": {
+            "field": "Label"
+          },
+          "align": {
+            "signal": "datum.Column === 0 ? 'right' : 'left'"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "font": {
+            "value": "Public Sans, Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 15
+          },
+          "fontWeight": {
+            "value": 600
+          },
+          "fill": {
+            "value": "#ffffff"
+          },
+          "stroke": {
+            "value": "#ffffff"
+          },
+          "strokeWidth": {
+            "value": 4
+          },
+          "strokeJoin": {
+            "value": "round"
+          },
+          "opacity": [
+            {
+              "test": "datum.Column !== 0 || sectorFocus === 'all' || indexof(lower(datum.Name), sectorFocus) === 0",
+              "value": 1
+            },
+            {
+              "value": 0.25
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "nodes"
+      },
+      "encode": {
+        "update": {
+          "x": {
+            "signal": "datum.Column === 0 ? datum.X - 10 : datum.LabelX"
+          },
+          "y": {
+            "field": "LabelY"
+          },
+          "text": {
+            "field": "Label"
+          },
+          "align": {
+            "signal": "datum.Column === 0 ? 'right' : 'left'"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "font": {
+            "value": "Public Sans, Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 15
+          },
+          "fontWeight": {
+            "value": 600
+          },
+          "fill": {
+            "value": "#172b50"
+          },
+          "opacity": [
+            {
+              "test": "datum.Column !== 0 || sectorFocus === 'all' || indexof(lower(datum.Name), sectorFocus) === 0",
+              "value": 1
+            },
+            {
+              "value": 0.25
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "stageLabels"
+      },
+      "encode": {
+        "update": {
+          "x": {
+            "field": "X"
+          },
+          "y": {
+            "value": 24
+          },
+          "text": {
+            "field": "Label"
+          },
+          "align": {
+            "value": "center"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "font": {
+            "value": "Public Sans, Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 17
+          },
+          "fontWeight": {
+            "value": "bold"
+          },
+          "fill": {
+            "value": "#21333a"
+          }
+        }
+      }
+    }
+  ],
+  "signals": [
+    {
+      "name": "sectorFocus",
+      "value": "all"
+    }
+  ]
+}

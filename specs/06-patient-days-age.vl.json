@@ -1,0 +1,73 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "values": []
+  },
+  "width": "container",
+  "height": 440,
+  "mark": {
+    "type": "bar",
+    "cornerRadiusEnd": 3
+  },
+  "encoding": {
+    "y": {
+      "field": "AgeGroup",
+      "type": "ordinal",
+      "sort": {
+        "field": "AgeOrder",
+        "order": "ascending"
+      },
+      "title": "Age group (years)",
+      "axis": {
+        "labelColor": "#6b7b80",
+        "titleColor": "#6b7b80"
+      }
+    },
+    "x": {
+      "field": "PatientDays",
+      "type": "quantitative",
+      "title": "Patient days",
+      "axis": {
+        "format": "~s",
+        "gridColor": "#edf1ef"
+      }
+    },
+    "tooltip": [
+      {
+        "field": "AgeGroup",
+        "title": "Age group (years)"
+      },
+      {
+        "field": "PatientDays",
+        "title": "Patient days",
+        "format": ","
+      }
+    ],
+    "color": {
+      "condition": {
+        "test": "datum.Older === true",
+        "value": "#14746f"
+      },
+      "value": "#b4d3ce"
+    }
+  },
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "gridColor": "#edf1ef",
+      "labelColor": "#6b7b80",
+      "titleColor": "#6b7b80",
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "titleFont": "Public Sans, Arial, sans-serif",
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "font": "Public Sans, Arial, sans-serif",
+    "legend": {
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    }
+  }
+}

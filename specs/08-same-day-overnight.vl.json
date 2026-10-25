@@ -1,57 +1,97 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": {
-    "text": "Same-day and overnight separations, 2024–25",
-    "anchor": "start",
-    "font": "Arial",
-    "fontSize": 15,
-    "color": "#21333a"
+  "data": {
+    "values": []
   },
-  "data": { "values": [] },
   "width": "container",
-  "height": 310,
-  "mark": { "type": "rect", "cornerRadius": 2, "stroke": "#ffffff", "strokeWidth": 2 },
+  "height": 350,
+  "mark": {
+    "type": "rect",
+    "cornerRadius": 2,
+    "stroke": "#ffffff",
+    "strokeWidth": 2
+  },
   "encoding": {
     "x": {
       "field": "Column",
       "type": "ordinal",
       "sort": "ascending",
       "axis": null,
-      "scale": { "paddingInner": 0.12, "paddingOuter": 0.05 }
+      "scale": {
+        "paddingInner": 0.12,
+        "paddingOuter": 0.05
+      }
     },
     "y": {
       "field": "Row",
       "type": "ordinal",
       "sort": "descending",
       "axis": null,
-      "scale": { "paddingInner": 0.12, "paddingOuter": 0.05 }
+      "scale": {
+        "paddingInner": 0.12,
+        "paddingOuter": 0.05
+      }
     },
     "color": {
       "field": "AdmissionStatus",
       "type": "nominal",
       "title": null,
       "scale": {
-        "domain": ["Same-day", "Overnight"],
-        "range": ["#14746f", "#d77b45"]
+        "domain": [
+          "Same-day",
+          "Overnight"
+        ],
+        "range": [
+          "#14746f",
+          "#d77b45"
+        ]
       },
-      "legend": { "orient": "bottom", "direction": "horizontal", "labelLimit": 360 }
+      "legend": {
+        "orient": "bottom",
+        "direction": "horizontal",
+        "labelLimit": 360
+      }
     },
     "tooltip": [
-      { "field": "Year", "title": "Financial year" },
-      { "field": "AdmissionStatus", "title": "Admission status" },
-      { "field": "Separations", "title": "Separations", "format": "," },
-      { "field": "SharePercent", "title": "Share of separations (%)", "format": ".1f" }
+      {
+        "field": "Year",
+        "title": "Financial year"
+      },
+      {
+        "field": "AdmissionStatus",
+        "title": "Admission status"
+      },
+      {
+        "field": "Separations",
+        "title": "Separations",
+        "format": ","
+      },
+      {
+        "field": "SharePercent",
+        "title": "Share of separations (%)",
+        "format": ".1f"
+      }
     ]
   },
   "config": {
-    "view": { "stroke": null },
+    "view": {
+      "stroke": null
+    },
     "axis": {
       "gridColor": "#edf1ef",
       "labelColor": "#6b7b80",
       "titleColor": "#6b7b80",
-      "labelFont": "Arial",
-      "titleFont": "Arial"
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "titleFont": "Public Sans, Arial, sans-serif",
+      "labelFontSize": 15,
+      "titleFontSize": 15
     },
-    "legend": { "labelFont": "Arial", "labelColor": "#6b7b80" }
+    "legend": {
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "labelColor": "#6b7b80",
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "font": "Public Sans, Arial, sans-serif"
   }
 }

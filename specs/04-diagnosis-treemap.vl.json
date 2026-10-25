@@ -1,0 +1,139 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "values": []
+  },
+  "width": 940,
+  "height": 480,
+  "layer": [
+    {
+      "mark": {
+        "type": "rect",
+        "stroke": "#ffffff",
+        "strokeWidth": 3,
+        "cornerRadius": 5
+      },
+      "encoding": {
+        "x": {
+          "field": "x",
+          "type": "quantitative",
+          "scale": {
+            "domain": [
+              0,
+              940
+            ],
+            "range": [
+              0,
+              940
+            ]
+          },
+          "axis": null
+        },
+        "x2": {
+          "field": "x2"
+        },
+        "y": {
+          "field": "y",
+          "type": "quantitative",
+          "scale": {
+            "domain": [
+              0,
+              480
+            ],
+            "range": [
+              0,
+              480
+            ]
+          },
+          "axis": null
+        },
+        "y2": {
+          "field": "y2"
+        },
+        "color": {
+          "condition": {
+            "test": "datum.Highlight === true",
+            "value": "#0f3d3e"
+          },
+          "value": "#4a9a90"
+        },
+        "tooltip": [
+          {
+            "field": "Diagnosis",
+            "title": "Major diagnostic group"
+          },
+          {
+            "field": "Admissions",
+            "title": "Acute separations",
+            "format": ","
+          }
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.Label !== ''"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "middle",
+        "font": "Public Sans, Arial, sans-serif",
+        "fontSize": 15,
+        "fontWeight": 600,
+        "color": "white"
+      },
+      "encoding": {
+        "x": {
+          "field": "LabelX",
+          "type": "quantitative",
+          "scale": {
+            "domain": [
+              0,
+              940
+            ],
+            "range": [
+              0,
+              940
+            ]
+          },
+          "axis": null
+        },
+        "y": {
+          "field": "LabelY",
+          "type": "quantitative",
+          "scale": {
+            "domain": [
+              0,
+              480
+            ],
+            "range": [
+              0,
+              480
+            ]
+          },
+          "axis": null
+        },
+        "text": {
+          "field": "Label"
+        }
+      }
+    }
+  ],
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "font": "Public Sans, Arial, sans-serif",
+    "axis": {
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "legend": {
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    }
+  }
+}

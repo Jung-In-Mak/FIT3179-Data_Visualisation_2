@@ -1,0 +1,169 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 360,
+  "projection": {
+    "type": "equalEarth"
+  },
+  "data": {
+    "values": []
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#939b98",
+        "strokeWidth": 0.3
+      },
+      "encoding": {
+        "color": {
+          "value": "#e4e9e6"
+        },
+        "tooltip": [
+          {
+            "field": "properties.ADMIN",
+            "title": "Country"
+          },
+          {
+            "field": "HospitalBedsTooltip",
+            "title": "Hospital beds per 1,000 people"
+          },
+          {
+            "field": "SourceYearTooltip",
+            "title": "Source data year"
+          }
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "isValid(datum.HospitalBedsPer1000)"
+        }
+      ],
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#ffffff",
+        "strokeWidth": 0.5
+      },
+      "encoding": {
+        "color": {
+          "field": "HospitalBedsPer1000",
+          "type": "quantitative",
+          "title": "Hospital beds per 1,000 people",
+          "scale": {
+            "scheme": "tealblues",
+            "domain": [
+              0,
+              13
+            ],
+            "clamp": true
+          },
+          "legend": {
+            "orient": "bottom-left",
+            "format": ".0f",
+            "titleLimit": 400,
+            "gradientLength": 230,
+            "offset": 0
+          }
+        },
+        "tooltip": [
+          {
+            "field": "properties.ADMIN",
+            "title": "Country"
+          },
+          {
+            "field": "HospitalBedsTooltip",
+            "title": "Hospital beds per 1,000 people"
+          },
+          {
+            "field": "SourceYearTooltip",
+            "title": "Source data year"
+          }
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.properties.ADMIN === 'Australia'"
+        }
+      ],
+      "mark": {
+        "type": "geoshape",
+        "fill": "#ffffff",
+        "fillOpacity": 0,
+        "stroke": "#21333a",
+        "strokeWidth": 2.5
+      },
+      "encoding": {
+        "tooltip": [
+          {
+            "field": "properties.ADMIN",
+            "title": "Country"
+          },
+          {
+            "field": "HospitalBedsTooltip",
+            "title": "Hospital beds per 1,000 people"
+          },
+          {
+            "field": "SourceYearTooltip",
+            "title": "Source data year"
+          }
+        ]
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {
+            "Longitude": 112,
+            "Latitude": -30,
+            "Label": "Australia"
+          }
+        ]
+      },
+      "mark": {
+        "type": "text",
+        "fontSize": 15,
+        "fontWeight": 700,
+        "color": "#21333a",
+        "align": "right",
+        "baseline": "middle",
+        "dx": -4
+      },
+      "encoding": {
+        "longitude": {
+          "field": "Longitude",
+          "type": "quantitative"
+        },
+        "latitude": {
+          "field": "Latitude",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "Label"
+        }
+      }
+    }
+  ],
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "legend": {
+      "labelColor": "#6b7b80",
+      "titleColor": "#21333a",
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "titleFont": "Public Sans, Arial, sans-serif",
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "font": "Public Sans, Arial, sans-serif",
+    "axis": {
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    }
+  },
+  "padding": 0
+}

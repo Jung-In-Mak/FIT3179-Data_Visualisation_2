@@ -1,0 +1,99 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "A matrix heatmap of hospital separations per 1,000 residents, by remoteness area of usual residence and financial year, 2013–14 to 2023–24.",
+  "data": {
+    "url": "data/separations-remoteness.csv",
+    "format": {
+      "type": "csv"
+    }
+  },
+  "width": 704,
+  "height": 320,
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "ordinal",
+      "title": null,
+      "axis": {
+        "labelAngle": 0,
+        "orient": "top",
+        "labelColor": "#6b7b80",
+        "ticks": false
+      }
+    },
+    "y": {
+      "field": "Remoteness",
+      "type": "ordinal",
+      "title": null,
+      "sort": [
+        "Major Cities",
+        "Inner Regional",
+        "Outer Regional",
+        "Remote",
+        "Very remote"
+      ],
+      "axis": {
+        "labelColor": "#21333a",
+        "ticks": false
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "rect",
+        "stroke": "#ffffff",
+        "strokeWidth": 3,
+        "cornerRadius": 4
+      },
+      "encoding": {
+        "color": {
+          "field": "Separations per 1,000",
+          "type": "quantitative",
+          "title": "Separations per 1,000",
+          "scale": {
+            "scheme": "teals"
+          },
+          "legend": {
+            "orient": "bottom",
+            "format": ".0f",
+            "direction": "horizontal",
+            "gradientLength": 260
+          }
+        },
+        "tooltip": [
+          {
+            "field": "Year",
+            "title": "Financial year"
+          },
+          {
+            "field": "Remoteness",
+            "title": "Remoteness area"
+          },
+          {
+            "field": "Separations per 1,000",
+            "title": "Separations per 1,000",
+            "type": "quantitative",
+            "format": ",.1f"
+          }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "domain": false,
+      "grid": false,
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "font": "Public Sans, Arial, sans-serif",
+    "legend": {
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    }
+  }
+}

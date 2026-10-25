@@ -1,0 +1,80 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "values": []
+  },
+  "width": "container",
+  "height": 300,
+  "projection": {
+    "type": "mercator"
+  },
+  "layer": [
+    {
+      "data": {
+        "values": []
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#f3f6f4",
+        "stroke": "#939b98",
+        "strokeWidth": 1
+      },
+      "encoding": {}
+    },
+    {
+      "data": {
+        "values": []
+      },
+      "mark": {
+        "type": "image",
+        "url": "./data/hospital.png",
+        "aspect": true,
+        "align": "center",
+        "baseline": "middle",
+        "width": 1,
+        "height": 1
+      },
+      "encoding": {
+        "longitude": {
+          "field": "Longitude",
+          "type": "quantitative"
+        },
+        "latitude": {
+          "field": "Latitude",
+          "type": "quantitative"
+        },
+        "tooltip": [
+          {
+            "field": "State",
+            "title": "State or territory"
+          },
+          {
+            "field": "RatePer1000",
+            "title": "Public separations per 1,000 people",
+            "format": ",.1f"
+          },
+          {
+            "field": "Admissions",
+            "title": "Public separations (count)",
+            "format": ","
+          }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": null,
+    "legend": {
+      "labelColor": "#6b7b80",
+      "titleColor": "#21333a",
+      "labelFont": "Public Sans, Arial, sans-serif",
+      "titleFont": "Public Sans, Arial, sans-serif",
+      "labelFontSize": 15,
+      "titleFontSize": 15
+    },
+    "font": "Public Sans, Arial, sans-serif"
+  }
+}

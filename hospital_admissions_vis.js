@@ -6,6 +6,7 @@ const palette = {
     teal: "#14746f",
     blue: "#88CCEE",
     orange: "#d77b45",
+    yellow: "#b7c043",
     purple: "#AA4499",
     wine_red: "#882255",
     line: "#ffffff"
@@ -84,21 +85,29 @@ async function prepareHospitalBedsWorldMap(spec) {
     ]);
     const valuesByCode = new Map(rows.map((row) => [row.Code, row]));
 
-    spec.data = {
-        values: world.features.map((feature) => {
-            const row = valuesByCode.get(feature.properties.ISO_A3_EH);
-            const originalYear = row?.["Hospital beds (per 1,000 people) (Original Year)"];
-            const bedsPer1000 = row ? Number(row["Hospital beds (per 1,000 people)"]) : null;
-            const hasBedsValue = Number.isFinite(bedsPer1000);
+    // Antarctica has no hospital-bed data and only adds empty space below the map.
+    const countries = world.features
+        .filter((feature) => feature.properties.ADMIN !== "Antarctica")
+        .map((feature) => {
+        const row = valuesByCode.get(feature.properties.ISO_A3_EH);
+        const originalYear = row?.["Hospital beds (per 1,000 people) (Original Year)"];
+        const bedsPer1000 = row ? Number(row["Hospital beds (per 1,000 people)"]) : null;
+        const hasBedsValue = Number.isFinite(bedsPer1000);
 
-            return {
-                ...feature,
-                HospitalBedsPer1000: hasBedsValue ? bedsPer1000 : null,
-                HospitalBedsTooltip: hasBedsValue ? bedsPer1000.toFixed(2) : "No data",
-                SourceYearTooltip: originalYear || row?.Year || "2021"
-            };
-        })
-    };
+        return {
+            ...feature,
+            HospitalBedsPer1000: hasBedsValue ? bedsPer1000 : null,
+            HospitalBedsTooltip: hasBedsValue ? bedsPer1000.toFixed(2) : "No data",
+            SourceYearTooltip: originalYear || row?.Year || "2021"
+        };
+    });
+    spec.data = { values: countries };
+
+    // Label Australia on the map with its value.
+    const australia = countries.find((country) => country.properties.ADMIN === "Australia");
+    if (australia && australia.HospitalBedsPer1000 !== null) {
+        spec.layer[3].data.values[0].Label = `Australia: ${australia.HospitalBedsPer1000.toFixed(1)}`;
+    }
 }
 
 // Display chart-specific fetch or rendering failures in the matching container.
@@ -110,21 +119,54 @@ function showChartError(containerId, error) {
         message.className = "chart-error";
         message.textContent = "This chart could not load its data. Check that the project is being served over localhost and try again.";
         container.appendChild(message);
+        const detail = document.createElement("p");
+        detail.className = "chart-error";
+        detail.textContent = `Details: ${error && error.message ? error.message : error}`;
+        container.appendChild(detail);
     }
     console.error(`Chart ${containerId} failed to load.`, error);
 }
 
-// Load, optionally prepare, and render one Vega-Lite chart.
-async function embedSpec(containerId, specPath, prepare) {
+// Load, optionally prepare, and render one Vega or Vega-Lite chart.
+// Charts that split hospitals into public and private register their views here so one control can highlight both.
+const sectorViews = [];
+let sectorFocus = "all";
+
+// Set the shared sector highlight ("all", "public" or "private") on every registered chart and button.
+function setSectorFocus(value) {
+    sectorFocus = value;
+    sectorViews.forEach((view) => {
+        try {
+            view.signal("sectorFocus", value).run();
+        } catch (error) {
+            console.warn("Could not update the sector highlight on a chart.", error);
+        }
+    });
+    document.querySelectorAll(".sector-toggle button").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.sector === value));
+    });
+}
+
+function initSectorControl() {
+    document.querySelectorAll(".sector-toggle button").forEach((button) => {
+        button.addEventListener("click", () => setSectorFocus(button.dataset.sector));
+    });
+}
+
+async function embedSpec(containerId, specPath, prepare, options = {}) {
     try {
         const spec = await loadJson(specPath);
         if (prepare) {
             await prepare(spec);
         }
-        await vegaEmbed(`#${containerId}`, spec, {
+        const result = await vegaEmbed(`#${containerId}`, spec, {
             actions: false,
             renderer: "svg"
         });
+        if (options.sectorHighlight) {
+            sectorViews.push(result.view);
+            if (sectorFocus !== "all") result.view.signal("sectorFocus", sectorFocus).run();
+        }
     } catch (error) {
         showChartError(containerId, error);
     }
@@ -233,10 +275,10 @@ function stateCentroid(feature) {
     return [longitudeTotal / areaTotal, latitudeTotal / areaTotal];
 }
 
-// Pair state totals with boundary geometry and scale symbol area to public separations.
+// Pair state totals with boundary geometry and scale symbol area to public separations per 1,000 residents.
 async function makeCartogramData(features) {
     const states = await loadCsv("data/state-pressure.csv");
-    const maxAdmissions = Math.max(...states.map((state) => numberValue(state.Admissions)));
+    const maxRate = Math.max(...states.map((state) => numberValue(state.RatePer1000)));
     const featuresByState = new Map(features.map((feature) => [feature.properties.STATE_NAME, feature]));
     return states.map((state) => {
         const feature = featuresByState.get(state.State);
@@ -245,15 +287,26 @@ async function makeCartogramData(features) {
         }
         const [longitude, latitude] = stateCentroid(feature);
         const admissions = numberValue(state.Admissions);
+        const rate = numberValue(state.RatePer1000);
         return {
             State: state.State,
             Admissions: admissions,
-            RatePer1000: numberValue(state.RatePer1000),
+            RatePer1000: rate,
             Longitude: longitude,
             Latitude: latitude,
-            SymbolSize: Math.sqrt(admissions / maxAdmissions) * maxStateSymbolSize
+            SymbolSize: Math.sqrt(rate / maxRate) * maxStateSymbolSize
         };
     });
+}
+
+// Pick round reference values (about four steps) up to the highest state rate.
+function niceLegendValues(maxValue) {
+    const rough = maxValue / 4;
+    const magnitude = 10 ** Math.floor(Math.log10(rough));
+    const step = [1, 2, 5, 10].map((multiple) => multiple * magnitude).find((value) => value >= rough);
+    const values = [];
+    for (let value = step; value <= maxValue + 1e-9; value += step) values.push(value);
+    return values;
 }
 
 // Build a small reference legend using the same image and area-based scale as the map symbols.
@@ -261,23 +314,22 @@ function renderStateSymbolLegend(states) {
     const legend = document.getElementById("state-symbol-legend");
     if (!legend) return;
 
-    const maxAdmissions = Math.max(...states.map((state) => state.Admissions));
-    const referenceValues = [400_000, 800_000, 1_200_000, 1_600_000, 2_000_000]
-        .filter((value) => value <= maxAdmissions);
+    const maxRate = Math.max(...states.map((state) => state.RatePer1000));
+    const referenceValues = niceLegendValues(maxRate);
 
     legend.replaceChildren(...referenceValues.map((value) => {
         const item = document.createElement("li");
-        item.setAttribute("aria-label", `${value.toLocaleString()} separations`);
+        item.setAttribute("aria-label", `${value.toLocaleString()} separations per 1,000 people`);
         const icon = document.createElement("img");
         icon.src = "data/hospital.png";
         icon.alt = "";
         icon.setAttribute("aria-hidden", "true");
-        const size = Math.sqrt(value / maxAdmissions) * maxStateSymbolSize;
+        const size = Math.sqrt(value / maxRate) * maxStateSymbolSize;
         icon.width = size;
         icon.height = size;
 
         const label = document.createElement("span");
-        label.textContent = formatCompact(value);
+        label.textContent = value.toLocaleString();
         item.append(icon, label);
         return item;
     }));
@@ -309,7 +361,7 @@ async function makeTreemapData() {
     for (const item of chartRectangles) {
         const width = item.x2 - item.x;
         const height = item.y2 - item.y;
-        const maxCharacters = Math.floor((width - 24) / 7.5);
+        const maxCharacters = Math.floor((width - 24) / 8.2);
         const labelAreaHeight = height - (item.ValueLabel ? 30 : 8);
         const maxLines = Math.floor((labelAreaHeight - labelTopPadding - 8) / labelLineHeight);
         if (maxCharacters < 8 || maxLines < 1) continue;
@@ -364,7 +416,7 @@ function aggregateFlows(rows) {
     }));
     const sectorColors = {
         "Public hospitals": palette.purple,
-        "Private hospitals": palette.orange
+        "Private hospitals": palette.yellow
     };
     const categoryColors = {
         Childbirth: palette.muted,
@@ -390,7 +442,7 @@ function aggregateFlows(rows) {
     const bottom = 492;
     const total = cleanRows.reduce((sum, row) => sum + row.Value, 0);
 
-    const stageFields = ["Sector", "Category", "ServiceType"];
+    const stageFields = ["Sector", "ServiceType", "Category"]; // left to right: sector, service type, broad category
     const nodeTotals = stageFields.map((field) => {
         const values = new Map();
         for (const row of cleanRows) {
@@ -426,8 +478,8 @@ function aggregateFlows(rows) {
                 Color: columnIndex === 0
                     ? sectorColors[Name] || palette.ink
                     : columnIndex === 1
-                        ? categoryColors[Name] || palette.blue
-                        : serviceColors[Name] || palette.purple
+                        ? serviceColors[Name] || palette.purple
+                        : categoryColors[Name] || palette.blue
             };
             y += height + gap;
             return node;
@@ -438,8 +490,8 @@ function aggregateFlows(rows) {
     const edgeTotals = new Map();
     for (const row of cleanRows) {
         for (const [fromColumn, from, to] of [
-            [0, row.Sector, row.Category],
-            [1, row.Category, row.ServiceType]
+            [0, row.Sector, row.ServiceType],
+            [1, row.ServiceType, row.Category]
         ]) {
             const key = `${fromColumn}:${row.Sector}:${from}:${to}`;
             const edge = edgeTotals.get(key) || {
@@ -499,190 +551,34 @@ function aggregateFlows(rows) {
     return { nodes, links, total };
 }
 
-function createSvgElement(name, attributes = {}) {
-    const element = document.createElementNS("http://www.w3.org/2000/svg", name);
-    for (const [attribute, value] of Object.entries(attributes)) {
-        element.setAttribute(attribute, value);
+// Add prepared alluvial geometry and tooltip fields to the Vega specification.
+async function prepareServiceFlow(spec) {
+    const rows = await loadCsv("data/service-flows.csv");
+    const { nodes, links, total } = aggregateFlows(rows);
+    const nodeData = spec.data.find((dataset) => dataset.name === "nodes");
+    const linkData = spec.data.find((dataset) => dataset.name === "links");
+    if (!nodeData || !linkData) {
+        throw new Error("The service-flow Vega specification is missing its nodes or links data source.");
     }
-    return element;
-}
 
-// Render the alluvial flow as SVG paths so each link can have a smooth, value-scaled ribbon.
-async function renderServiceFlow() {
-    try {
-        const rows = await loadCsv("data/service-flows.csv");
-        const { nodes, links, total } = aggregateFlows(rows);
-        const container = document.getElementById("chart-patient-flow");
-        if (!container) {
-            throw new Error("Could not find the hospital service flow chart container.");
+    nodeData.values = nodes.map((node) => ({
+        ...node,
+        Tooltip: {
+            Category: node.Name,
+            Separations: node.Value.toLocaleString(),
+            Share: `${(node.Value / total * 100).toFixed(1)}%`
         }
-
-        const svg = createSvgElement("svg", {
-            viewBox: "0 0 1120 520",
-            width: "100%",
-            role: "img",
-            "aria-label": "Hospital separations flowing from sector through care category to service type",
-            preserveAspectRatio: "xMidYMid meet"
-        });
-        const description = createSvgElement("title");
-        description.textContent = "Hospital separations flow from hospital sector through broad category to service type.";
-        svg.appendChild(description);
-
-        const columnHeadings = [
-            ["HOSPITAL SECTOR", 167],
-            ["BROAD CATEGORY", 497],
-            ["SERVICE TYPE", 827]
-        ];
-        for (const [label, x] of columnHeadings) {
-            const heading = createSvgElement("text", {
-                x,
-                y: 24,
-                "text-anchor": "middle",
-                "font-family": "Arial, sans-serif",
-                "font-size": 17,
-                "font-weight": 700,
-                fill: palette.ink
-            });
-            heading.textContent = label;
-            svg.appendChild(heading);
+    }));
+    linkData.values = links.map((link) => ({
+        ...link,
+        Tooltip: {
+            Sector: link.Sector,
+            From: link.Source,
+            To: link.Target,
+            Separations: link.Value.toLocaleString(),
+            Share: `${(link.Value / total * 100).toFixed(1)}%`
         }
-
-        const tooltip = document.createElement("div");
-        tooltip.id = "service-flow-tooltip";
-        tooltip.className = "service-flow-tooltip";
-        tooltip.setAttribute("role", "tooltip");
-        tooltip.hidden = true;
-
-        const showTooltip = (rows, clientX, clientY) => {
-            const table = document.createElement("table");
-            const body = document.createElement("tbody");
-            for (const [label, value] of rows) {
-                const row = document.createElement("tr");
-                const heading = document.createElement("th");
-                const cell = document.createElement("td");
-                heading.scope = "row";
-                heading.textContent = label;
-                cell.textContent = value;
-                row.append(heading, cell);
-                body.appendChild(row);
-            }
-            table.appendChild(body);
-            tooltip.replaceChildren(table);
-            tooltip.hidden = false;
-            const bounds = container.getBoundingClientRect();
-            const left = Math.min(
-                Math.max(clientX - bounds.left + 14, 8),
-                bounds.width - tooltip.offsetWidth - 8
-            );
-            const top = Math.min(
-                Math.max(clientY - bounds.top + 14, 8),
-                bounds.height - tooltip.offsetHeight - 8
-            );
-            tooltip.style.left = `${left}px`;
-            tooltip.style.top = `${top}px`;
-        };
-
-        const bindTooltip = (group, rows) => {
-            group.setAttribute("tabindex", "0");
-            group.setAttribute("aria-describedby", tooltip.id);
-            const showAtPointer = (event) => showTooltip(rows, event.clientX, event.clientY);
-            group.addEventListener("pointerenter", showAtPointer);
-            group.addEventListener("pointermove", showAtPointer);
-            group.addEventListener("pointerleave", () => {
-                tooltip.hidden = true;
-            });
-            group.addEventListener("focus", () => {
-                const bounds = group.getBoundingClientRect();
-                showTooltip(rows, bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
-            });
-            group.addEventListener("blur", () => {
-                tooltip.hidden = true;
-            });
-        };
-
-        for (const link of links) {
-            const group = createSvgElement("g", {
-                role: "graphics-symbol",
-                "aria-label": `${link.Sector}: ${link.Source} to ${link.Target}: ${link.Value.toLocaleString()} separations`
-            });
-            const path = createSvgElement("path", {
-                d: link.Path,
-                fill: link.Color,
-                opacity: 0.58
-            });
-            group.appendChild(path);
-            bindTooltip(group, [
-                ["Sector", link.Sector],
-                ["From", link.Source],
-                ["To", link.Target],
-                ["Separations", link.Value.toLocaleString()],
-                ["Share", `${(link.Value / total * 100).toFixed(1)}%`]
-            ]);
-            svg.appendChild(group);
-        }
-
-        for (const node of nodes) {
-            const group = createSvgElement("g", {
-                role: "graphics-symbol",
-                "aria-label": `${node.Name}: ${node.Value.toLocaleString()} separations, ${(node.Value / total * 100).toFixed(1)} percent`
-            });
-            const rect = createSvgElement("rect", {
-                x: node.X,
-                y: node.Y,
-                width: node.X2 - node.X,
-                height: node.Y2 - node.Y,
-                fill: node.Color
-            });
-            group.appendChild(rect);
-            bindTooltip(group, [
-                ["Category", node.Name],
-                ["Separations", node.Value.toLocaleString()],
-                ["Share", `${(node.Value / total * 100).toFixed(1)}%`]
-            ]);
-
-            if (node.Label) {
-                const label = createSvgElement("text", {
-                    x: node.Column === 0 ? node.X - 10 : node.LabelX,
-                    y: node.LabelY,
-                    "text-anchor": node.Column === 0 ? "end" : "start",
-                    "dominant-baseline": "middle",
-                    "font-family": "Arial, sans-serif",
-                    "font-size": 15,
-                    "font-weight": 600,
-                    fill: palette.ink,
-                    stroke: "#ffffff",
-                    "stroke-width": 5,
-                    "stroke-linejoin": "round",
-                    "paint-order": "stroke"
-                });
-                label.textContent = node.Label;
-                group.appendChild(label);
-            }
-            if (node.ValueLabel) {
-                const valueLabel = createSvgElement("text", {
-                    x: node.Column === 0 ? node.X - 10 : node.LabelX,
-                    y: node.ValueY,
-                    "text-anchor": node.Column === 0 ? "end" : "start",
-                    "dominant-baseline": "middle",
-                    "font-family": "Arial, sans-serif",
-                    "font-size": 15,
-                    fill: palette.ink,
-                    stroke: "#ffffff",
-                    "stroke-width": 4,
-                    "stroke-linejoin": "round",
-                    "paint-order": "stroke"
-                });
-                valueLabel.textContent = node.ValueLabel;
-                group.appendChild(valueLabel);
-            }
-            svg.appendChild(group);
-        }
-
-        container.replaceChildren(svg);
-        container.appendChild(tooltip);
-    } catch (error) {
-        showChartError("chart-patient-flow", error);
-    }
+    }));
 }
 
 // Expand 2024–25 totals into 100 cells, rounding the same-day share to the nearest percent.
@@ -711,19 +607,37 @@ async function makeAdmissionTypeWaffle() {
     }));
 }
 
-// Each entry connects an HTML container to a Vega-Lite spec; custom charts receive data before embedding.
+// Label the end of each sector line directly (for example "Public 7.1m"), so readers need not match colours to the legend.
+async function addSectorEndLabels(spec, csvPath, valueField) {
+    const rows = (await loadCsv(csvPath)).filter((row) => /^(public|private) hospitals$/i.test(row.Sector));
+    const lastYear = [...new Set(rows.map((row) => row.Year))].sort().pop();
+    spec.layer[1].data = {
+        values: rows.filter((row) => row.Year === lastYear).map((row) => {
+            const value = numberValue(row[valueField]);
+            return {
+                Year: row.Year,
+                Sector: row.Sector,
+                [valueField]: value,
+                Label: `${/^public/i.test(row.Sector) ? "Public" : "Private"} ${(value / 1_000_000).toFixed(1)}m`
+            };
+        })
+    };
+}
+
+// Each entry connects an HTML container to a Vega or Vega-Lite spec.
+// IDs, spec file names and the chart numbers on the page all share the same 01–12 order.
 async function renderDashboard() {
+    initSectorControl();
     const charts = [
-        embedSpec("chart-admissions", "specs/01-admissions-trend.vl.json"),
-        embedSpec("chart-state-rates", "specs/02-state-choropleth.vl.json", prepareHospitalBedsWorldMap),
-        embedSpec("chart-age-sex", "specs/03-age-sex.vl.json"),
-        embedSpec("chart-patient-days-age", "specs/12-patient-days-age.vl.json"),
-        embedSpec("chart-patient-days", "specs/05-patient-days.vl.json"),
-        embedSpec("chart-admission-type", "specs/08-same-day-overnight.vl.json?v=2", async (spec) => {
-            spec.data.values = await makeAdmissionTypeWaffle();
-        }),
-        embedSpec("chart-facilities", "specs/07-hospital-locations.vl.json"),
-        embedSpec("chart-cartogram", "specs/04-state-cartogram.vl.json", async (spec) => {
+        // 01 World choropleth
+        embedSpec("chart-01-world-beds", "specs/01-world-beds-choropleth.vl.json", prepareHospitalBedsWorldMap),
+
+        // 02 Separations by sector over time
+        embedSpec("chart-02-separations-trend", "specs/02-separations-trend.vl.json",
+            (spec) => addSectorEndLabels(spec, "data/hospital_admissions.csv", "Admissions"), { sectorHighlight: true }),
+
+        // 03 Proportional symbol map of public separations by state
+        embedSpec("chart-03-state-separations", "specs/03-state-separations.vl.json", async (spec) => {
             const boundaries = await loadJson("data/australian-states.geojson");
             const states = await makeCartogramData(boundaries.features);
             spec.layer[0].data.values = boundaries.features;
@@ -740,12 +654,59 @@ async function renderDashboard() {
             }));
             spec.layer.splice(1, 1, ...stateSymbols);
         }),
-        embedSpec("chart-diagnoses", "specs/06-diagnosis-treemap.vl.json", async (spec) => {
+
+        // 04 Treemap of diagnostic groups
+        embedSpec("chart-04-diagnosis-treemap", "specs/04-diagnosis-treemap.vl.json", async (spec) => {
             const { rectangles, labels } = await makeTreemapData();
-            spec.data.values = rectangles;
+            // Figure-ground: the largest group is drawn in the darkest colour.
+            const largest = Math.max(...rectangles.map((item) => item.Admissions));
+            spec.data.values = rectangles.map((item) => ({ ...item, Highlight: item.Admissions === largest }));
             spec.layer[1].data = { values: labels };
         }),
-        renderServiceFlow()
+
+        // 05 Population pyramid
+        embedSpec("chart-05-age-sex", "specs/05-age-sex.vl.json"),
+
+        // 06 Patient days by age group
+        embedSpec("chart-06-patient-days-age", "specs/06-patient-days-age.vl.json", async (spec) => {
+            // Figure-ground: age groups from 65 upwards are drawn in the strong colour.
+            const rows = await loadCsv("data/patient-days-age-2024-25.csv");
+            spec.data = {
+                values: rows.map((row) => ({
+                    ...row,
+                    AgeOrder: numberValue(row.AgeOrder),
+                    PatientDays: numberValue(row.PatientDays),
+                    Older: parseInt(row.AgeGroup, 10) >= 65
+                }))
+            };
+        }),
+
+        // 07 Patient days by sector over time
+        embedSpec("chart-07-patient-days-sector", "specs/07-patient-days-sector.vl.json",
+            (spec) => addSectorEndLabels(spec, "data/patient-days-sector.csv", "PatientDays"), { sectorHighlight: true }),
+
+        // 08 Waffle chart: same-day vs overnight
+        embedSpec("chart-08-same-day-overnight", "specs/08-same-day-overnight.vl.json", async (spec) => {
+            const cells = await makeAdmissionTypeWaffle();
+            spec.data.values = cells;
+        }),
+
+        // 09 Alluvial flow: sector to service type
+        embedSpec("chart-09-service-flow", "specs/09-service-flow.vg.json", prepareServiceFlow, { sectorHighlight: true }),
+
+        // 10 Dot map of hospital locations
+        embedSpec("chart-10-hospital-locations", "specs/10-hospital-locations.vl.json"),
+
+        // 11 Matrix heatmap: remoteness area by year
+        embedSpec("chart-11-separations-remoteness", "specs/11-separations-remoteness.vl.json", (spec) => {
+            // Compact, square cells: size the grid from the available width (11 years by 5 areas), up to 72px per cell.
+            const container = document.getElementById("chart-11-separations-remoteness");
+            const available = (container ? container.clientWidth : 900) - 150; // room for the area labels
+            const cell = Math.max(30, Math.min(72, Math.floor(available / 11)));
+            spec.width = cell * 11;
+            spec.height = cell * 5;
+            if (cell < 62) spec.encoding.x.axis.labelAngle = -45;
+        })
     ];
 
     // Start independent chart loads together rather than making the page wait on them sequentially.
@@ -753,3 +714,53 @@ async function renderDashboard() {
 }
 
 renderDashboard();
+
+// ---------------------------------------------------------------------------
+// Reading width: keep every printed line of text to at most ten words.
+// A block is narrowed only as far as needed, so short blocks keep their natural width.
+// ---------------------------------------------------------------------------
+const maxWordsPerLine = 10;
+
+function mostWordsOnOneLine(element) {
+    const lines = new Map();
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+        const node = walker.currentNode;
+        const wordPattern = /\S+/g;
+        let match;
+        while ((match = wordPattern.exec(node.data)) !== null) {
+            const range = document.createRange();
+            range.setStart(node, match.index);
+            range.setEnd(node, match.index + match[0].length);
+            const rect = range.getClientRects()[0];
+            if (!rect) continue;
+            const line = Math.round(rect.top / 6);
+            lines.set(line, (lines.get(line) || 0) + 1);
+        }
+    }
+    return Math.max(0, ...lines.values());
+}
+
+function limitWordsPerLine(element) {
+    element.style.maxWidth = "";
+    let width = element.getBoundingClientRect().width;
+    for (let attempt = 0; attempt < 40 && width > 140 && mostWordsOnOneLine(element) > maxWordsPerLine; attempt += 1) {
+        width *= 0.94;
+        element.style.maxWidth = `${Math.round(width)}px`;
+    }
+}
+
+function limitAllTextLines() {
+    document.querySelectorAll("main p, main dd, main li, main h1, main h2, main h3, header p, header h1, footer p")
+        .forEach(limitWordsPerLine);
+}
+
+let textResizeTimer;
+const startTextLimits = () => {
+    limitAllTextLines();
+    window.addEventListener("resize", () => {
+        clearTimeout(textResizeTimer);
+        textResizeTimer = setTimeout(limitAllTextLines, 150);
+    });
+};
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(startTextLimits);
